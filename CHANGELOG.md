@@ -1,3 +1,10 @@
+## [3.12.5](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/3.12.4...3.12.5) (2023-03-16)
+
+
+### Bug Fixes
+
+* use custom body analyzer ([3ae071f](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/3ae071fa046580b73ab4834f7f7d9cb3bfee8a66))
+
 ## [3.12.4](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/3.12.3...3.12.4) (2022-06-30)
 
 
