@@ -47,11 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class AbstractIndexer implements Indexer {
 
     /**
-     * Logger
-     */
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    /**
      * Elasticsearch client.
      */
     @Autowired
