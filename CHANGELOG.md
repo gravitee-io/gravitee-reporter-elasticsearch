@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/4.0.1...4.0.2) (2023-05-24)
+
+
+### Bug Fixes
+
+* backport es8 support for apim 3.20.x ([167fbaf](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/167fbaf8c74180b1a43f927014895258aed89209))
+
 ## [4.0.1](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/4.0.0...4.0.1) (2023-03-16)
 
 ### Bug Fixes
