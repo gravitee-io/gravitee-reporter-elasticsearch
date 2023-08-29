@@ -1,3 +1,10 @@
+## [4.0.3](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/4.0.2...4.0.3) (2023-08-29)
+
+
+### Bug Fixes
+
+* read pem certs and keys as a list for ElasticSearch configuration ([da3f82c](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/da3f82c076dbfc152b8f3b774d7220faeb5da5e3))
+
 ## [4.0.2](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/4.0.1...4.0.2) (2023-05-24)
 
 
