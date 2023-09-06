@@ -17,7 +17,7 @@ package io.gravitee.reporter.elasticsearch.spring;
 
 import io.gravitee.elasticsearch.client.Client;
 import io.gravitee.elasticsearch.client.http.*;
-import io.gravitee.elasticsearch.templating.freemarker.FreeMarkerComponent;
+import io.gravitee.reporter.common.formatter.FreeMarkerComponent;
 import io.gravitee.reporter.elasticsearch.config.PipelineConfiguration;
 import io.gravitee.reporter.elasticsearch.config.ReporterConfiguration;
 import io.vertx.rxjava3.core.Vertx;
