@@ -1,3 +1,10 @@
+## [5.3.3](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/5.3.2...5.3.3) (2024-11-07)
+
+
+### Bug Fixes
+
+* index success attribute in health index ([866654d](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/866654df5751922f3511332ab6df8bd141aca132))
+
 ## [5.3.2](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/5.3.1...5.3.2) (2024-06-04)
 
 
