@@ -21,6 +21,7 @@ import io.gravitee.common.util.EnvironmentUtils;
 import io.gravitee.elasticsearch.config.Endpoint;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -37,6 +38,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
 public class ReporterConfiguration {
 
     private static final String DEFAULT_ELASTICSEARCH_ENDPOINT = "http://localhost:9200";
+    private static final String INDEX_STATE_MANAGEMENT = "ism";
+    private static final String INDEX_LIFECYCLE_MANAGEMENT = "ilm";
 
     @Autowired
     private ConfigurableEnvironment environment;
@@ -205,6 +208,12 @@ public class ReporterConfiguration {
      */
     @Value("${reporters.elasticsearch.lifecycle.policy_property_name:index.lifecycle.name}")
     private String indexLifecyclePolicyPropertyName;
+
+    @Value("${reporters.elasticsearch.lifecycle.min_size:30gb}")
+    private String indexLifecycleMinSize;
+
+    @Value("${reporters.elasticsearch.lifecycle.min_index_age:#{null}}")
+    private String indexLifecycleMinIndexAge;
 
     /**
      * Extended settings template
@@ -515,8 +524,8 @@ public class ReporterConfiguration {
         this.indexMode = indexMode;
     }
 
-    public boolean isIlmManagedIndex() {
-        return "ilm".equalsIgnoreCase(indexMode);
+    public boolean isManagedIndex() {
+        return Stream.of(INDEX_LIFECYCLE_MANAGEMENT, INDEX_STATE_MANAGEMENT).anyMatch(mode -> mode.equalsIgnoreCase(indexMode));
     }
 
     private List<String> readPropertyAsList(String property) {
@@ -536,5 +545,13 @@ public class ReporterConfiguration {
         }
 
         return properties;
+    }
+
+    public String getIndexLifecycleMinSize() {
+        return indexLifecycleMinSize;
+    }
+
+    public String getIndexLifecycleMinIndexAge() {
+        return indexLifecycleMinIndexAge;
     }
 }

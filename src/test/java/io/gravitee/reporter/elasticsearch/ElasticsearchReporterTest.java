@@ -39,12 +39,16 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -53,17 +57,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author GraviteeSource Team
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { ElasticsearchReporterTest.TestConfig.class })
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class ElasticsearchReporterTest {
 
-    @Autowired
-    private ElasticsearchReporter reporter;
-
-    private TestScheduler testScheduler;
-
     @Configuration
-    @Import(IntegrationTestConfiguration.class) // the actual configuration
-    public static class TestConfig {
+    @Import(ElasticsearchIntegrationTestConfiguration.class)
+    public static class TestConfigWithElasticsearch {
 
         @Bean
         public ElasticsearchReporter reporter() {
@@ -71,270 +70,298 @@ public class ElasticsearchReporterTest {
         }
     }
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        testScheduler = new TestScheduler();
-        RxJavaPlugins.setComputationSchedulerHandler(ignore -> testScheduler);
+    @Nested
+    @ContextConfiguration(classes = { TestConfigWithElasticsearch.class })
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+    class UsingElasticsearch extends ReporterTests {}
 
-        this.reporter.start();
+    @Configuration
+    @Import(OpensearchIntegrationTestConfiguration.class)
+    public static class TestConfigWithOpensearch {
+
+        @Bean
+        public ElasticsearchReporter reporter() {
+            return new ElasticsearchReporter();
+        }
     }
 
-    @AfterEach
-    public void tearsDown() throws Exception {
-        this.reporter.stop();
+    @Nested
+    @ContextConfiguration(classes = { TestConfigWithOpensearch.class })
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+    class UsingOpensearch extends ReporterTests {}
 
-        // reset it
-        RxJavaPlugins.setComputationSchedulerHandler(null);
-    }
+    abstract static class ReporterTests {
 
-    @Test
-    void shouldReportMetrics() throws InterruptedException {
-        final Metrics requestMetrics = Metrics.on(Instant.now().toEpochMilli()).build();
-        requestMetrics.setTransactionId("transactionId");
-        requestMetrics.setTenant("tenant");
-        requestMetrics.setStatus(200);
-        requestMetrics.setResponseContentLength(10);
-        requestMetrics.setUri("uri");
-        requestMetrics.setRemoteAddress("remoteAddress");
-        requestMetrics.setLocalAddress("localAddress");
-        requestMetrics.setRequestId("requestId");
-        requestMetrics.setHttpMethod(HttpMethod.GET);
-        requestMetrics.setRequestContentLength(20);
-        requestMetrics.setProxyResponseTimeMs(10);
+        @Autowired
+        private ElasticsearchReporter reporter;
 
-        requestMetrics.setProxyLatencyMs(100);
-        requestMetrics.setPlan("plan");
-        requestMetrics.setMessage("message");
-        requestMetrics.setEndpoint("endPoint");
+        private TestScheduler testScheduler;
 
-        requestMetrics.setApplication("application");
-        requestMetrics.setApiResponseTimeMs(100);
-        requestMetrics.setApi("api");
-        requestMetrics.setSecurityType(API_KEY);
-        requestMetrics.setSecurityToken("apiKey");
+        @BeforeEach
+        public void setUp() throws Exception {
+            testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(ignore -> testScheduler);
 
-        // bulk of three line
-        TestObserver metrics1 = reporter.rxReport(requestMetrics).test();
-        TestObserver metrics2 = reporter.rxReport(requestMetrics).test();
-        TestObserver metrics3 = reporter.rxReport(requestMetrics).test();
+            this.reporter.start();
+        }
 
-        // advance time manually
-        testScheduler.advanceTimeBy(5, TimeUnit.SECONDS);
+        @AfterEach
+        public void tearsDown() throws Exception {
+            this.reporter.stop();
 
-        metrics1.await();
-        metrics2.await();
-        metrics3.await();
+            // reset it
+            RxJavaPlugins.setComputationSchedulerHandler(null);
+        }
 
-        metrics1.assertNoErrors();
-        metrics2.assertNoErrors();
-        metrics3.assertNoErrors();
-    }
+        @Test
+        void should_report_metrics() throws InterruptedException {
+            final Metrics requestMetrics = Metrics.on(Instant.now().toEpochMilli()).build();
+            requestMetrics.setTransactionId("transactionId");
+            requestMetrics.setTenant("tenant");
+            requestMetrics.setStatus(200);
+            requestMetrics.setResponseContentLength(10);
+            requestMetrics.setUri("uri");
+            requestMetrics.setRemoteAddress("remoteAddress");
+            requestMetrics.setLocalAddress("localAddress");
+            requestMetrics.setRequestId("requestId");
+            requestMetrics.setHttpMethod(HttpMethod.GET);
+            requestMetrics.setRequestContentLength(20);
+            requestMetrics.setProxyResponseTimeMs(10);
 
-    @Test
-    void shoutReportHealth() throws InterruptedException {
-        final Response defaultResponse = new Response();
-        defaultResponse.setStatus(200);
-        final Request defaultRequest = new Request();
-        defaultRequest.setUri("https://api.gravitee.io/echo/echo");
-        defaultRequest.setMethod(HttpMethod.GET);
-        final Step defaultStep = EndpointStatus
-            .forStep("default-step")
-            .responseTime(117)
-            .success()
-            .request(defaultRequest)
-            .response(defaultResponse)
-            .build();
+            requestMetrics.setProxyLatencyMs(100);
+            requestMetrics.setPlan("plan");
+            requestMetrics.setMessage("message");
+            requestMetrics.setEndpoint("endPoint");
 
-        final Response anotherResponse = new Response();
-        anotherResponse.setStatus(500);
-        final Request anotherRequest = new Request();
-        anotherRequest.setUri("https://api.gravitee.io/echo/echo");
-        anotherRequest.setMethod(HttpMethod.GET);
+            requestMetrics.setApplication("application");
+            requestMetrics.setApiResponseTimeMs(100);
+            requestMetrics.setApi("api");
+            requestMetrics.setSecurityType(API_KEY);
+            requestMetrics.setSecurityToken("apiKey");
 
-        final Step anotherStep = EndpointStatus
-            .forStep("another-step")
-            .responseTime(57)
-            .fail("NPE")
-            .request(defaultRequest)
-            .response(defaultResponse)
-            .build();
+            // bulk of three line
+            TestObserver metrics1 = reporter.rxReport(requestMetrics).test();
+            TestObserver metrics2 = reporter.rxReport(requestMetrics).test();
+            TestObserver metrics3 = reporter.rxReport(requestMetrics).test();
 
-        final EndpointStatus endpointHealthStatus = EndpointStatus
-            .forEndpoint("be0aa9c9-ca1c-4d0a-8aa9-c9ca1c5d0aab", "https://api.gravitee.io/echo/")
-            .on(Instant.now().toEpochMilli())
-            .step(defaultStep)
-            .step(anotherStep)
-            .build();
+            // advance time manually
+            testScheduler.advanceTimeBy(5, TimeUnit.SECONDS);
 
-        endpointHealthStatus.setAvailable(true);
-        endpointHealthStatus.setState(3);
-        endpointHealthStatus.setResponseTime(175);
+            metrics1.await();
+            metrics2.await();
+            metrics3.await();
 
-        TestObserver<Reportable> metrics1 = reporter.rxReport(endpointHealthStatus).test();
+            metrics1.assertNoErrors();
+            metrics2.assertNoErrors();
+            metrics3.assertNoErrors();
+        }
 
-        // advance time manually
-        testScheduler.advanceTimeBy(5, TimeUnit.SECONDS);
+        @Test
+        void shout_report_health() throws InterruptedException {
+            final Response defaultResponse = new Response();
+            defaultResponse.setStatus(200);
+            final Request defaultRequest = new Request();
+            defaultRequest.setUri("https://api.gravitee.io/echo/echo");
+            defaultRequest.setMethod(HttpMethod.GET);
+            final Step defaultStep = EndpointStatus
+                .forStep("default-step")
+                .responseTime(117)
+                .success()
+                .request(defaultRequest)
+                .response(defaultResponse)
+                .build();
 
-        metrics1.await();
-        metrics1.assertNoErrors();
-    }
+            final Response anotherResponse = new Response();
+            anotherResponse.setStatus(500);
+            final Request anotherRequest = new Request();
+            anotherRequest.setUri("https://api.gravitee.io/echo/echo");
+            anotherRequest.setMethod(HttpMethod.GET);
 
-    @Test
-    void shouldReportMonitor() throws Exception {
-        final JvmInfo jvmInfo = new JvmInfo(100, 20000);
+            final Step anotherStep = EndpointStatus
+                .forStep("another-step")
+                .responseTime(57)
+                .fail("NPE")
+                .request(defaultRequest)
+                .response(defaultResponse)
+                .build();
 
-        JvmInfo.GarbageCollector youngInfo = new JvmInfo.GarbageCollector();
-        youngInfo.collectionCount = 5;
-        youngInfo.collectionTime = 199;
-        youngInfo.name = "young";
+            final EndpointStatus endpointHealthStatus = EndpointStatus
+                .forEndpoint("be0aa9c9-ca1c-4d0a-8aa9-c9ca1c5d0aab", "https://api.gravitee.io/echo/")
+                .on(Instant.now().toEpochMilli())
+                .step(defaultStep)
+                .step(anotherStep)
+                .build();
 
-        JvmInfo.GarbageCollector oldInfo = new JvmInfo.GarbageCollector();
-        oldInfo.collectionCount = 2;
-        oldInfo.collectionTime = 206;
-        oldInfo.name = "old";
+            endpointHealthStatus.setAvailable(true);
+            endpointHealthStatus.setState(3);
+            endpointHealthStatus.setResponseTime(175);
 
-        jvmInfo.gc = new JvmInfo.GarbageCollectors();
-        jvmInfo.gc.collectors = new JvmInfo.GarbageCollector[] { youngInfo, oldInfo };
+            TestObserver<Reportable> metrics1 = reporter.rxReport(endpointHealthStatus).test();
 
-        jvmInfo.mem = new JvmInfo.Mem();
-        jvmInfo.mem.heapCommitted = 1;
-        jvmInfo.mem.heapMax = 1;
-        jvmInfo.mem.heapUsed = 1;
-        jvmInfo.mem.nonHeapCommitted = 1;
-        jvmInfo.mem.nonHeapUsed = 1;
-        JvmInfo.MemoryPool young = new JvmInfo.MemoryPool("young", 85549752, 137363456, 134742016, 137363456);
-        JvmInfo.MemoryPool survivor = new JvmInfo.MemoryPool("survivor", 16821208, 137363456, 134742016, 137363456);
-        JvmInfo.MemoryPool old = new JvmInfo.MemoryPool("old", 17060240, 137363456, 134742016, 137363456);
-        jvmInfo.mem.pools = new JvmInfo.MemoryPool[] { young, survivor, old };
+            // advance time manually
+            testScheduler.advanceTimeBy(5, TimeUnit.SECONDS);
 
-        jvmInfo.threads = new JvmInfo.Threads();
-        jvmInfo.threads.count = 3;
-        jvmInfo.threads.peakCount = 3;
+            metrics1.await();
+            metrics1.assertNoErrors();
+        }
 
-        final OsInfo osInfo = new OsInfo();
-        osInfo.cpu = new OsInfo.Cpu();
-        osInfo.cpu.loadAverage = null;
-        osInfo.cpu.percent = 1;
+        @Test
+        void should_report_monitor() throws Exception {
+            final JvmInfo jvmInfo = new JvmInfo(100, 20000);
 
-        osInfo.mem = new OsInfo.Mem();
-        osInfo.mem.free = 1;
-        osInfo.mem.total = 10;
+            JvmInfo.GarbageCollector youngInfo = new JvmInfo.GarbageCollector();
+            youngInfo.collectionCount = 5;
+            youngInfo.collectionTime = 199;
+            youngInfo.name = "young";
 
-        osInfo.swap = new OsInfo.Swap();
-        osInfo.swap.free = 1;
-        osInfo.swap.total = 10;
+            JvmInfo.GarbageCollector oldInfo = new JvmInfo.GarbageCollector();
+            oldInfo.collectionCount = 2;
+            oldInfo.collectionTime = 206;
+            oldInfo.name = "old";
 
-        osInfo.timestamp = 10;
+            jvmInfo.gc = new JvmInfo.GarbageCollectors();
+            jvmInfo.gc.collectors = new JvmInfo.GarbageCollector[] { youngInfo, oldInfo };
 
-        final ProcessInfo processInfo = new ProcessInfo();
-        processInfo.maxFileDescriptors = 1;
-        processInfo.openFileDescriptors = 1;
-        processInfo.timestamp = 10;
+            jvmInfo.mem = new JvmInfo.Mem();
+            jvmInfo.mem.heapCommitted = 1;
+            jvmInfo.mem.heapMax = 1;
+            jvmInfo.mem.heapUsed = 1;
+            jvmInfo.mem.nonHeapCommitted = 1;
+            jvmInfo.mem.nonHeapUsed = 1;
+            JvmInfo.MemoryPool young = new JvmInfo.MemoryPool("young", 85549752, 137363456, 134742016, 137363456);
+            JvmInfo.MemoryPool survivor = new JvmInfo.MemoryPool("survivor", 16821208, 137363456, 134742016, 137363456);
+            JvmInfo.MemoryPool old = new JvmInfo.MemoryPool("old", 17060240, 137363456, 134742016, 137363456);
+            jvmInfo.mem.pools = new JvmInfo.MemoryPool[] { young, survivor, old };
 
-        final Monitor monitor = Monitor
-            .on("b187fe8f-98fa-4aa9-87fe-8f98facaa956")
-            .at(Instant.now().toEpochMilli())
-            .jvm(jvmInfo)
-            .os(osInfo)
-            .process(processInfo)
-            .build();
+            jvmInfo.threads = new JvmInfo.Threads();
+            jvmInfo.threads.count = 3;
+            jvmInfo.threads.peakCount = 3;
 
-        TestObserver metrics1 = reporter.rxReport(monitor).test();
+            final OsInfo osInfo = new OsInfo();
+            osInfo.cpu = new OsInfo.Cpu();
+            osInfo.cpu.loadAverage = null;
+            osInfo.cpu.percent = 1;
 
-        // advance time manually
-        testScheduler.advanceTimeBy(5, TimeUnit.SECONDS);
+            osInfo.mem = new OsInfo.Mem();
+            osInfo.mem.free = 1;
+            osInfo.mem.total = 10;
 
-        metrics1.await();
-        metrics1.assertNoErrors();
-    }
+            osInfo.swap = new OsInfo.Swap();
+            osInfo.swap.free = 1;
+            osInfo.swap.total = 10;
 
-    @Test
-    void shouldReportLog() throws InterruptedException {
-        Log log = new Log(Instant.now().toEpochMilli());
+            osInfo.timestamp = 10;
 
-        log.setApi("my-api");
-        log.setRequestId("my-request-id");
+            final ProcessInfo processInfo = new ProcessInfo();
+            processInfo.maxFileDescriptors = 1;
+            processInfo.openFileDescriptors = 1;
+            processInfo.timestamp = 10;
 
-        Request clientReq = new Request();
-        clientReq.setUri("http//gateway-url");
-        clientReq.setMethod(HttpMethod.POST);
-        clientReq.setBody("request-payload");
-        HttpHeaders clientReqHeaders = HttpHeaders.create();
-        clientReqHeaders.add("my-header", "my-header-value");
-        clientReq.setHeaders(clientReqHeaders);
+            final Monitor monitor = Monitor
+                .on("b187fe8f-98fa-4aa9-87fe-8f98facaa956")
+                .at(Instant.now().toEpochMilli())
+                .jvm(jvmInfo)
+                .os(osInfo)
+                .process(processInfo)
+                .build();
 
-        Request proxyReq = new Request();
-        proxyReq.setUri("http//backend-url");
-        proxyReq.setMethod(HttpMethod.POST);
-        proxyReq.setBody("request-payload");
-        HttpHeaders proxyReqHeaders = HttpHeaders.create();
-        proxyReqHeaders.add("my-header", "my-header-value");
-        proxyReq.setHeaders(proxyReqHeaders);
+            TestObserver metrics1 = reporter.rxReport(monitor).test();
 
-        Response proxyResp = new Response();
-        proxyResp.setStatus(HttpStatusCode.OK_200);
-        proxyResp.setBody("response-payload");
-        HttpHeaders proxyRespHeaders = HttpHeaders.create();
-        proxyRespHeaders.add("my-header", "my-header-value");
-        proxyResp.setHeaders(proxyRespHeaders);
+            // advance time manually
+            testScheduler.advanceTimeBy(5, TimeUnit.SECONDS);
 
-        Response clientResp = new Response();
-        clientResp.setStatus(HttpStatusCode.OK_200);
-        clientResp.setBody("response-payload");
-        HttpHeaders clientRespHeaders = HttpHeaders.create();
-        clientRespHeaders.add("my-header", "my-header-value");
-        clientResp.setHeaders(clientRespHeaders);
+            metrics1.await();
+            metrics1.assertNoErrors();
+        }
 
-        log.setClientRequest(clientReq);
-        log.setProxyRequest(proxyReq);
-        log.setProxyResponse(proxyResp);
-        log.setClientResponse(clientResp);
+        @Test
+        void should_report_log() throws InterruptedException {
+            Log log = new Log(Instant.now().toEpochMilli());
 
-        TestObserver logObs = reporter.rxReport(log).test();
+            log.setApi("my-api");
+            log.setRequestId("my-request-id");
 
-        // advance time manually
-        testScheduler.advanceTimeBy(5, TimeUnit.SECONDS);
+            Request clientReq = new Request();
+            clientReq.setUri("http//gateway-url");
+            clientReq.setMethod(HttpMethod.POST);
+            clientReq.setBody("request-payload");
+            HttpHeaders clientReqHeaders = HttpHeaders.create();
+            clientReqHeaders.add("my-header", "my-header-value");
+            clientReq.setHeaders(clientReqHeaders);
 
-        logObs.await();
-        logObs.assertNoErrors();
-    }
+            Request proxyReq = new Request();
+            proxyReq.setUri("http//backend-url");
+            proxyReq.setMethod(HttpMethod.POST);
+            proxyReq.setBody("request-payload");
+            HttpHeaders proxyReqHeaders = HttpHeaders.create();
+            proxyReqHeaders.add("my-header", "my-header-value");
+            proxyReq.setHeaders(proxyReqHeaders);
 
-    @Test
-    void reportTest() throws InterruptedException {
-        TestObserver metrics1 = reporter.rxReport(mockRequestMetrics()).test();
+            Response proxyResp = new Response();
+            proxyResp.setStatus(HttpStatusCode.OK_200);
+            proxyResp.setBody("response-payload");
+            HttpHeaders proxyRespHeaders = HttpHeaders.create();
+            proxyRespHeaders.add("my-header", "my-header-value");
+            proxyResp.setHeaders(proxyRespHeaders);
 
-        // advance time manually
-        testScheduler.advanceTimeBy(5, TimeUnit.SECONDS);
+            Response clientResp = new Response();
+            clientResp.setStatus(HttpStatusCode.OK_200);
+            clientResp.setBody("response-payload");
+            HttpHeaders clientRespHeaders = HttpHeaders.create();
+            clientRespHeaders.add("my-header", "my-header-value");
+            clientResp.setHeaders(clientRespHeaders);
 
-        metrics1.await();
-        metrics1.assertNoErrors();
-    }
+            log.setClientRequest(clientReq);
+            log.setProxyRequest(proxyReq);
+            log.setProxyResponse(proxyResp);
+            log.setClientResponse(clientResp);
 
-    private Metrics mockRequestMetrics() {
-        Metrics requestMetrics = Metrics.on(new Date().getTime()).build();
-        requestMetrics.setApi("4d8d6ca8-c2c7-4ab8-8d6c-a8c2c79ab8a1");
-        requestMetrics.setSecurityType(API_KEY);
-        requestMetrics.setSecurityToken("e14cfcb8-188d-4cb9-ad06-002aea5aab12");
-        requestMetrics.setApiResponseTimeMs(50);
-        requestMetrics.setApplication("31b0d824-4f6a-4f58-b0d8-244f6a4f58d7");
-        requestMetrics.setEndpoint("31b0d824-4f6a-4f58-b0d8-244f6a4f58d7");
-        requestMetrics.setMessage(null);
-        requestMetrics.setPlan("1fe07b71-ae91-4c15-a07b-71ae919c1560");
-        requestMetrics.setProxyLatencyMs(1);
-        requestMetrics.setProxyResponseTimeMs(51);
-        requestMetrics.setRequestContentLength(0);
-        requestMetrics.setHttpMethod(HttpMethod.GET);
-        requestMetrics.setRequestId("ac096af0-cc48-4264-896a-f0cc4872644e");
-        requestMetrics.setLocalAddress("172.18.0.6");
-        requestMetrics.setRemoteAddress("172.18.0.1");
-        requestMetrics.setUri("/echo");
-        requestMetrics.setResponseContentLength(700);
-        requestMetrics.setStatus(HttpStatusCode.OK_200);
-        requestMetrics.setTenant(null);
-        requestMetrics.setTransactionId("ba571368-f5e6-48b7-9713-68f5e698b761");
-        requestMetrics.addCustomMetric("CustomMetricKey1", "CustomMetricValue1");
-        requestMetrics.addCustomMetric("CustomMetricKey2", "CustomMetricValue2");
+            TestObserver logObs = reporter.rxReport(log).test();
 
-        return requestMetrics;
+            // advance time manually
+            testScheduler.advanceTimeBy(5, TimeUnit.SECONDS);
+
+            logObs.await();
+            logObs.assertNoErrors();
+        }
+
+        @Test
+        void report_test() throws InterruptedException {
+            TestObserver metrics1 = reporter.rxReport(mockRequestMetrics()).test();
+
+            // advance time manually
+            testScheduler.advanceTimeBy(5, TimeUnit.SECONDS);
+
+            metrics1.await();
+            metrics1.assertNoErrors();
+        }
+
+        private Metrics mockRequestMetrics() {
+            Metrics requestMetrics = Metrics.on(new Date().getTime()).build();
+            requestMetrics.setApi("4d8d6ca8-c2c7-4ab8-8d6c-a8c2c79ab8a1");
+            requestMetrics.setSecurityType(API_KEY);
+            requestMetrics.setSecurityToken("e14cfcb8-188d-4cb9-ad06-002aea5aab12");
+            requestMetrics.setApiResponseTimeMs(50);
+            requestMetrics.setApplication("31b0d824-4f6a-4f58-b0d8-244f6a4f58d7");
+            requestMetrics.setEndpoint("31b0d824-4f6a-4f58-b0d8-244f6a4f58d7");
+            requestMetrics.setMessage(null);
+            requestMetrics.setPlan("1fe07b71-ae91-4c15-a07b-71ae919c1560");
+            requestMetrics.setProxyLatencyMs(1);
+            requestMetrics.setProxyResponseTimeMs(51);
+            requestMetrics.setRequestContentLength(0);
+            requestMetrics.setHttpMethod(HttpMethod.GET);
+            requestMetrics.setRequestId("ac096af0-cc48-4264-896a-f0cc4872644e");
+            requestMetrics.setLocalAddress("172.18.0.6");
+            requestMetrics.setRemoteAddress("172.18.0.1");
+            requestMetrics.setUri("/echo");
+            requestMetrics.setResponseContentLength(700);
+            requestMetrics.setStatus(HttpStatusCode.OK_200);
+            requestMetrics.setTenant(null);
+            requestMetrics.setTransactionId("ba571368-f5e6-48b7-9713-68f5e698b761");
+            requestMetrics.addCustomMetric("CustomMetricKey1", "CustomMetricValue1");
+            requestMetrics.addCustomMetric("CustomMetricKey2", "CustomMetricValue2");
+
+            return requestMetrics;
+        }
     }
 }
