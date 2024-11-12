@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.reporter.elasticsearch.mapping.es8;
+package io.gravitee.reporter.elasticsearch.mapping.os;
 
 import io.gravitee.elasticsearch.utils.Type;
 import io.gravitee.reporter.elasticsearch.config.PipelineConfiguration;
 import io.gravitee.reporter.elasticsearch.mapping.PerTypeIndexPreparer;
-import io.reactivex.rxjava3.core.*;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.CompletableObserver;
+import io.reactivex.rxjava3.core.CompletableSource;
 import io.reactivex.rxjava3.functions.Function;
 import java.util.Collections;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * @author David BRASSELY (david.brassely at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class ES8IndexPreparer extends PerTypeIndexPreparer {
+public class OsIndexPreparer extends PerTypeIndexPreparer {
 
     /**
      * Configuration of pipelineConfiguration
@@ -38,6 +39,9 @@ public class ES8IndexPreparer extends PerTypeIndexPreparer {
 
     @Override
     public Completable prepare() {
+        if (configuration.isManagedIndex()) {
+            return prepareIsmPolicy().andThen(indexMapping()).andThen(pipeline());
+        }
         return indexMapping().andThen(pipeline());
     }
 
@@ -48,24 +52,45 @@ public class ES8IndexPreparer extends PerTypeIndexPreparer {
             final String templateName = configuration.getIndexName() + '-' + typeName;
             final String aliasName = configuration.getIndexName() + '-' + typeName;
 
-            logger.debug("Trying to put template mapping for type[{}] name[{}]", typeName, templateName);
-
             Map<String, Object> data = getTemplateData();
+            logger.debug("Trying to put template mapping for type[{}] name[{}]", typeName, templateName);
             data.put("indexName", configuration.getIndexName() + '-' + typeName);
+            data.put("indexesPrefix", configuration.getIndexName());
 
-            final String template = freeMarkerComponent.generateFromTemplate("/es8x/mapping/index-template-" + typeName + ".ftl", data);
-
-            final Completable templateCreationCompletable = client.putIndexTemplate(templateName, template);
+            final String template = freeMarkerComponent.generateFromTemplate("/os/mapping/index-template-" + typeName + ".ftl", data);
             if (configuration.isManagedIndex()) {
-                return templateCreationCompletable.andThen(ensureAlias(aliasName));
+                return client.putTemplate(templateName, template).andThen(Completable.defer(() -> ensureAlias(aliasName)));
             }
-            return templateCreationCompletable;
+            return client.putTemplate(templateName, template);
         };
+    }
+
+    private Completable prepareIsmPolicy() {
+        final String indexesPrefix = configuration.getIndexName();
+        Map<String, Object> data = getTemplateData();
+        data.put("indexesPrefix", indexesPrefix);
+        data.put("indexLifecycleMinSize", configuration.getIndexLifecycleMinSize());
+        data.put("indexLifecycleMinIndexAge", configuration.getIndexLifecycleMinIndexAge());
+        return createPolicyIfAbsent(indexesPrefix, freeMarkerComponent.generateFromTemplate("/os/policies/index-policy.ftl", data));
+    }
+
+    private Completable createPolicyIfAbsent(String policyName, String policy) {
+        return client
+            .getPolicy(policyName)
+            .flatMapCompletable(policyJson ->
+                client.createOrUpdatePolicy(
+                    policyName,
+                    policy,
+                    policyJson.get("_seq_no").toString(),
+                    policyJson.get("_primary_term").toString()
+                )
+            )
+            .onErrorResumeNext(throwable -> client.createOrUpdatePolicy(policyName, policy, null, null));
     }
 
     private Completable ensureAlias(String aliasName) {
         final String aliasTemplate = freeMarkerComponent.generateFromTemplate(
-            "/es8x/alias/alias.ftl",
+            "/os/alias/alias.ftl",
             Collections.singletonMap("aliasName", aliasName)
         );
 

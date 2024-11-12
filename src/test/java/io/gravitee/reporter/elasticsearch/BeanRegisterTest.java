@@ -26,6 +26,7 @@ import io.gravitee.reporter.elasticsearch.indexer.name.PerTypeAndDateIndexNameGe
 import io.gravitee.reporter.elasticsearch.indexer.name.PerTypeIndexNameGenerator;
 import io.gravitee.reporter.elasticsearch.mapping.es7.ES7IndexPreparer;
 import io.gravitee.reporter.elasticsearch.mapping.es8.ES8IndexPreparer;
+import io.gravitee.reporter.elasticsearch.mapping.os.OsIndexPreparer;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -121,7 +122,7 @@ class BeanRegisterTest {
             register.registerBeans(opensearchInfo(version), reporterConfiguration);
 
             assertThat(applicationContext.getBean("indexer")).isInstanceOf(ES7BulkIndexer.class);
-            assertThat(applicationContext.getBean("indexPreparer")).isInstanceOf(ES7IndexPreparer.class);
+            assertThat(applicationContext.getBean("indexPreparer")).isInstanceOf(OsIndexPreparer.class);
             assertThat(applicationContext.getBean("indexNameGenerator")).isInstanceOf(PerTypeAndDateIndexNameGenerator.class);
         }
 
@@ -130,12 +131,12 @@ class BeanRegisterTest {
         @ValueSource(strings = { "1.0.0", "2.6" })
         void should_instantiate_beans_for_opensearch_ilm_mode(String version) {
             var reporterConfiguration = new ReporterConfiguration();
-            reporterConfiguration.setIndexMode("ilm");
+            reporterConfiguration.setIndexMode("ism");
 
             register.registerBeans(opensearchInfo(version), reporterConfiguration);
 
             assertThat(applicationContext.getBean("indexer")).isInstanceOf(ES7BulkIndexer.class);
-            assertThat(applicationContext.getBean("indexPreparer")).isInstanceOf(ES7IndexPreparer.class);
+            assertThat(applicationContext.getBean("indexPreparer")).isInstanceOf(OsIndexPreparer.class);
             assertThat(applicationContext.getBean("indexNameGenerator")).isInstanceOf(PerTypeIndexNameGenerator.class);
         }
     }
