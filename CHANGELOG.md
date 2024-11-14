@@ -1,3 +1,10 @@
+## [5.3.4](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/5.3.3...5.3.4) (2024-11-14)
+
+
+### Bug Fixes
+
+* allow users to configure opensearch index state management ([b2764bf](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/b2764bf686259706f0fd80723b407e145328e19b))
+
 ## [5.3.3](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/5.3.2...5.3.3) (2024-11-07)
 
 
