@@ -56,7 +56,7 @@ public class ES8IndexPreparer extends PerTypeIndexPreparer {
             final String template = freeMarkerComponent.generateFromTemplate("/es8x/mapping/index-template-" + typeName + ".ftl", data);
 
             final Completable templateCreationCompletable = client.putIndexTemplate(templateName, template);
-            if (configuration.isManagedIndex()) {
+            if (configuration.isIlmManagedIndex()) {
                 return templateCreationCompletable.andThen(ensureAlias(aliasName));
             }
             return templateCreationCompletable;

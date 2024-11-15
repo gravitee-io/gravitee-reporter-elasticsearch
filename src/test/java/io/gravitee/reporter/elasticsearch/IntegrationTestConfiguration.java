@@ -32,7 +32,7 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
  */
 @Configuration
 @Import(UnitTestConfiguration.class)
-public class ElasticsearchIntegrationTestConfiguration {
+public class IntegrationTestConfiguration {
 
     public static final String ELASTICSEARCH_DEFAULT_VERSION = "8.5.2";
     public static final String CLUSTER_NAME = "gravitee_test";

@@ -18,9 +18,9 @@ package io.gravitee.reporter.elasticsearch.spring;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.gravitee.reporter.api.log.Log;
-import io.gravitee.reporter.elasticsearch.ElasticsearchIntegrationTestConfiguration;
 import io.gravitee.reporter.elasticsearch.ElasticsearchReporter;
 import io.gravitee.reporter.elasticsearch.ElasticsearchReporterTest;
+import io.gravitee.reporter.elasticsearch.IntegrationTestConfiguration;
 import io.gravitee.reporter.elasticsearch.config.ReporterConfiguration;
 import io.gravitee.reporter.elasticsearch.indexer.name.IndexNameGenerator;
 import io.gravitee.reporter.elasticsearch.indexer.name.PerTypeAndDateIndexNameGenerator;
@@ -41,7 +41,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author GraviteeSource Team
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { ElasticsearchReporterTest.TestConfigWithElasticsearch.class })
+@ContextConfiguration(classes = { ElasticsearchReporterTest.TestConfig.class })
 class IndexNameGeneratorRegistrationTest {
 
     @Autowired
@@ -56,7 +56,7 @@ class IndexNameGeneratorRegistrationTest {
     @Autowired
     ConfigurableEnvironment environment;
 
-    @Value("${elasticsearch.version:" + ElasticsearchIntegrationTestConfiguration.ELASTICSEARCH_DEFAULT_VERSION + "}")
+    @Value("${elasticsearch.version:" + IntegrationTestConfiguration.ELASTICSEARCH_DEFAULT_VERSION + "}")
     private String elasticsearchVersion;
 
     private static final long TIMESTAMP = Instant.parse("2021-12-13T00:00:00.00Z").toEpochMilli();

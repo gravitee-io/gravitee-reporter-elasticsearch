@@ -22,7 +22,7 @@ import io.gravitee.reporter.elasticsearch.indexer.name.AbstractIndexNameGenerato
 import io.gravitee.reporter.elasticsearch.indexer.name.PerTypeAndDateIndexNameGenerator;
 import io.gravitee.reporter.elasticsearch.indexer.name.PerTypeIndexNameGenerator;
 import io.gravitee.reporter.elasticsearch.mapping.AbstractIndexPreparer;
-import io.gravitee.reporter.elasticsearch.mapping.os.OsIndexPreparer;
+import io.gravitee.reporter.elasticsearch.mapping.es7.ES7IndexPreparer;
 
 /**
  * @author GraviteeSource Team
@@ -36,11 +36,11 @@ public class OpenSearchBeanRegistrer extends AbstractElasticBeanRegistrer {
 
     @Override
     protected Class<? extends AbstractIndexPreparer> getIndexPreparerClass(ReporterConfiguration configuration) {
-        return OsIndexPreparer.class;
+        return ES7IndexPreparer.class;
     }
 
     @Override
     protected Class<? extends AbstractIndexNameGenerator> getIndexNameGeneratorClass(ReporterConfiguration configuration) {
-        return configuration.isManagedIndex() ? PerTypeIndexNameGenerator.class : PerTypeAndDateIndexNameGenerator.class;
+        return configuration.isIlmManagedIndex() ? PerTypeIndexNameGenerator.class : PerTypeAndDateIndexNameGenerator.class;
     }
 }

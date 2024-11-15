@@ -42,6 +42,6 @@ public class Elastic8xBeanRegistrer extends AbstractElasticBeanRegistrer {
 
     @Override
     protected Class<? extends AbstractIndexNameGenerator> getIndexNameGeneratorClass(ReporterConfiguration configuration) {
-        return configuration.isManagedIndex() ? PerTypeIndexNameGenerator.class : PerTypeAndDateIndexNameGenerator.class;
+        return configuration.isIlmManagedIndex() ? PerTypeIndexNameGenerator.class : PerTypeAndDateIndexNameGenerator.class;
     }
 }
