@@ -1,3 +1,15 @@
+## [5.3.5](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/5.3.4...5.3.5) (2024-11-15)
+
+
+### Bug Fixes
+
+* use index state management policy id and rollover alias properties for ism ([d744cde](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/d744cdedb2b729e2bda25960d50db9e4cd60eb06))
+
+
+### Reverts
+
+* Revert "fix: allow users to configure opensearch index state management" ([131ddf3](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/131ddf3004578761ef0c9e884e21111a65b8ae68))
+
 ## [5.3.4](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/5.3.3...5.3.4) (2024-11-14)
 
 
