@@ -10,7 +10,7 @@
         "actions": [
           {
             "rollover": {
-              <#if indexLifecycleMinIndexAge??>"min_index_age": "${indexLifecycleMinIndexAge}"</#if>
+              <#if indexLifecycleMinIndexAge??>"min_index_age": "${indexLifecycleMinIndexAge}",</#if>
               "min_size": "${indexLifecycleMinSize}"
             }
           }
