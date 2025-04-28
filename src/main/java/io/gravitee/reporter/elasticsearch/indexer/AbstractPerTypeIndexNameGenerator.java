@@ -21,6 +21,7 @@ import io.gravitee.reporter.api.health.EndpointStatus;
 import io.gravitee.reporter.api.http.Metrics;
 import io.gravitee.reporter.api.log.Log;
 import io.gravitee.reporter.api.monitor.Monitor;
+import io.gravitee.reporter.api.v4.common.MetricsDimensions;
 import io.gravitee.reporter.elasticsearch.config.ReporterConfiguration;
 import java.time.Instant;
 
@@ -54,6 +55,8 @@ public abstract class AbstractPerTypeIndexNameGenerator extends AbstractIndexNam
             type = Type.V4_MESSAGE_METRICS.getType();
         } else if (reportable instanceof io.gravitee.reporter.api.v4.log.MessageLog) {
             type = Type.V4_MESSAGE_LOG.getType();
+        } else if (reportable instanceof MetricsDimensions) {
+            type = Type.V4_METRICS_DATA_STREAM.getType();
         }
 
         return generate(type, reportable.timestamp());
