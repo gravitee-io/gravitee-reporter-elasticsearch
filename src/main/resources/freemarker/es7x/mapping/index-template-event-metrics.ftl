@@ -1,6 +1,6 @@
 <#ftl output_format="JSON">
 {
-    "index_patterns": ["event-metrics*"],
+    "index_patterns": ["gravitee-event-metrics*"],
     "data_stream": {},
     "settings": {
         "index.mode": "time_series",
