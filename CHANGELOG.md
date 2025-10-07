@@ -1,3 +1,10 @@
+## [6.0.5](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.0.4...6.0.5) (2025-10-07)
+
+
+### Bug Fixes
+
+* Elastic Index Error in V2 and V4 http proxy ([5e73fe4](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/5e73fe45740ab51dff2f3e58aa1fd67fa57068ea))
+
 ## [6.0.4](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.0.3...6.0.4) (2025-10-01)
 
 
