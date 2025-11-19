@@ -57,13 +57,11 @@ public class BeanRegister {
             return null;
         }
 
-        switch (elasticsearchInfo.getVersion().getMajorVersion()) {
-            case 7:
-                return new Elastic7xBeanRegistrer();
-            case 8:
-                return new Elastic8xBeanRegistrer();
-            default:
-                return null;
-        }
+        return switch (elasticsearchInfo.getVersion().getMajorVersion()) {
+            case 7 -> new Elastic7xBeanRegistrer();
+            case 8 -> new Elastic8xBeanRegistrer();
+            case 9 -> new Elastic9xBeanRegistrer();
+            default -> null;
+        };
     }
 }

@@ -68,10 +68,7 @@ class IndexNameGeneratorRegistrationTest {
 
     @Test
     void testIndexNameGeneratorRegistration_should_register_per_type_and_date_generator() throws Exception {
-        if (elasticsearchVersion.startsWith("7")) {
-            configuration.setIndexMode("daily");
-        }
-        if (elasticsearchVersion.startsWith("8")) {
+        if (elasticsearchVersion.startsWith("7") || elasticsearchVersion.startsWith("8") || elasticsearchVersion.startsWith("9")) {
             configuration.setIndexMode("daily");
         }
         reporter.start();
@@ -84,10 +81,7 @@ class IndexNameGeneratorRegistrationTest {
 
     @Test
     void testIndexNameGenerator_should_register_multi_type_or_per_type_generator() throws Exception {
-        if (elasticsearchVersion.startsWith("7")) {
-            configuration.setIndexMode("ilm");
-        }
-        if (elasticsearchVersion.startsWith("8")) {
+        if (elasticsearchVersion.startsWith("7") || elasticsearchVersion.startsWith("8") || elasticsearchVersion.startsWith("9")) {
             configuration.setIndexMode("ilm");
         }
         reporter.start();
@@ -95,11 +89,7 @@ class IndexNameGeneratorRegistrationTest {
         IndexNameGenerator indexNameGenerator = (IndexNameGenerator) applicationContext.getBean("indexNameGenerator");
         String generatedName = indexNameGenerator.generate(new Log(TIMESTAMP));
 
-        if (elasticsearchVersion.startsWith("7")) {
-            assertThat(indexNameGenerator.getClass()).isEqualTo(PerTypeIndexNameGenerator.class);
-            assertThat(generatedName).isEqualTo("gravitee-log");
-        }
-        if (elasticsearchVersion.startsWith("8")) {
+        if (elasticsearchVersion.startsWith("7") || elasticsearchVersion.startsWith("8") || elasticsearchVersion.startsWith("9")) {
             assertThat(indexNameGenerator.getClass()).isEqualTo(PerTypeIndexNameGenerator.class);
             assertThat(generatedName).isEqualTo("gravitee-log");
         }
