@@ -55,7 +55,7 @@ public class IntegrationTestConfiguration {
             "docker.elastic.co/elasticsearch/elasticsearch:" + elasticsearchVersion
         );
         elasticsearchContainer.withEnv("cluster.name", CLUSTER_NAME);
-        if (elasticsearchVersion.startsWith("8")) {
+        if (elasticsearchVersion.startsWith("8") || elasticsearchVersion.startsWith("9")) {
             elasticsearchContainer.withEnv("xpack.security.enabled", "false");
         }
         elasticsearchContainer.start();
