@@ -1,3 +1,10 @@
+## [6.3.2](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.3.1...6.3.2) (2025-11-21)
+
+
+### Bug Fixes
+
+* support ES 9.x ([da5b1a6](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/da5b1a66b5d7b4cdc20db810f4d127d902fa389e))
+
 ## [6.3.1](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.3.0...6.3.1) (2025-11-20)
 
 
