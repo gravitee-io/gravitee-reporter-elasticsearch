@@ -24,13 +24,11 @@ import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.CompletableSource;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.functions.Function;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -81,5 +79,17 @@ public abstract class AbstractIndexPreparer implements IndexPreparer {
         data.put("extendedRequestMappingTemplate", this.configuration.getExtendedRequestMappingTemplate());
         data.put("extendedSettingsTemplate", this.configuration.getExtendedSettingsTemplate());
         return data;
+    }
+
+    protected Completable ensureAlias(String aliasName) {
+        final String aliasTemplate = freeMarkerComponent.generateFromTemplate(
+                "/common/alias/alias.ftl",
+                Collections.singletonMap("aliasName", aliasName)
+        );
+
+        return client
+                .getAlias(aliasName)
+                .switchIfEmpty(client.createIndexWithAlias(aliasName + "-000001", aliasTemplate).toMaybe())
+                .ignoreElement();
     }
 }

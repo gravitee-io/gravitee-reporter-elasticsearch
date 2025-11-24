@@ -24,7 +24,6 @@ import io.gravitee.reporter.elasticsearch.mapping.AbstractIndexPreparer;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.CompletableSource;
 import io.reactivex.rxjava3.functions.Function;
-import java.util.Collections;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,15 +71,4 @@ public class ES7IndexPreparer extends AbstractIndexPreparer {
         };
     }
 
-    private Completable ensureAlias(String aliasName) {
-        final String aliasTemplate = freeMarkerComponent.generateFromTemplate(
-            "/es7x/alias/alias.ftl",
-            Collections.singletonMap("aliasName", aliasName)
-        );
-
-        return client
-            .getAlias(aliasName)
-            .switchIfEmpty(client.createIndexWithAlias(aliasName + "-000001", aliasTemplate).toMaybe())
-            .ignoreElement();
-    }
 }
