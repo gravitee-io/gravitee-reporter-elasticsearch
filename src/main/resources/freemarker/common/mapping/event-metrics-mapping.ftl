@@ -27,6 +27,14 @@
         "type": "keyword",
         "time_series_dimension": true
     },
+    "doc-type": {
+        "type": "keyword",
+        "time_series_dimension": true
+    },
+    "operation": {
+        "type": "keyword",
+        "time_series_dimension": true
+    },
     "downstream-publish-messages-total": {
         "type": "integer",
         "time_series_metric": "counter"
@@ -93,5 +101,33 @@
     },
     "@timestamp": {
         "type": "date"
+    },
+    "request-durations-millis": {
+        "type": "long",
+        "time_series_metric": "counter"
+    },
+    "endpoint-durations-millis": {
+        "type": "long",
+        "time_series_metric": "counter"
+    },
+    "response-durations-millis": {
+        "type": "long",
+        "time_series_metric": "counter"
+    },
+    "requests-total": {
+        "type": "integer",
+        "time_series_metric": "counter"
+    },
+    "endpoint-requests-total": {
+        "type": "integer",
+        "time_series_metric": "counter"
+    },
+    "endpoint-responses-total": {
+        "type": "integer",
+        "time_series_metric": "counter"
+    },
+    "responses-total": {
+        "type": "integer",
+        "time_series_metric": "counter"
     }
 }

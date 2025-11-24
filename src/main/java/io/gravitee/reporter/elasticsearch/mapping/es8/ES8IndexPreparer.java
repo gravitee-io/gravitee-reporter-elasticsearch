@@ -37,5 +37,4 @@ public class ES8IndexPreparer extends AbstractIndexPreparer {
     ) {
         super(configuration, pipelineConfiguration, freeMarkerComponent, client, "/esx8");
     }
-
 }

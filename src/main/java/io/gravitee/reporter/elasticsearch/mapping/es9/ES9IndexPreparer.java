@@ -36,5 +36,4 @@ public class ES9IndexPreparer extends AbstractIndexPreparer {
     ) {
         super(configuration, pipelineConfiguration, freeMarkerComponent, client, "/esx9");
     }
-
 }
