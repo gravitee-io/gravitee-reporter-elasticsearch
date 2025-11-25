@@ -17,6 +17,12 @@
             "@timestamp": {
                 "type": "date"
             },
+            "org-id": {
+                "type": "keyword"
+            },
+            "env-id": {
+                "type": "keyword"
+            },
             "api-id": {
                 "type": "keyword"
             },
@@ -64,6 +70,12 @@
             },
             "gateway-latency-ms": {
                 "type": "integer"
+            },
+            "quota-count": {
+                "type": "keyword"
+            },
+            "quota-limit": {
+                "type": "keyword"
             }
             <#if extendedRequestMappingTemplate??>,<#include "/${extendedRequestMappingTemplate}"></#if>
         },
