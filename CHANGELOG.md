@@ -1,3 +1,10 @@
+## [6.3.3](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.3.2...6.3.3) (2025-11-25)
+
+
+### Bug Fixes
+
+* bump reporter-common version ([f41d21b](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/f41d21bce5e14249d38717094902d9e607d49ade))
+
 ## [6.3.2](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.3.1...6.3.2) (2025-11-21)
 
 
