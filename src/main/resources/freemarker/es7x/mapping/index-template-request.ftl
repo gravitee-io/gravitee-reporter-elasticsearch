@@ -14,6 +14,12 @@
                 "@timestamp": {
                     "type": "date"
                 },
+                "org-id": {
+                    "type": "keyword"
+                },
+                "env-id": {
+                    "type": "keyword"
+                },
                 "api": {
                     "type": "keyword"
                 },
@@ -197,6 +203,12 @@
                             "index": true
                         }
                     }
+                },
+                "quota-count": {
+                    "type": "keyword"
+                },
+                "quota-limit": {
+                    "type": "keyword"
                 }
                 <#if extendedRequestMappingTemplate??>,<#include "/${extendedRequestMappingTemplate}"></#if>
             },

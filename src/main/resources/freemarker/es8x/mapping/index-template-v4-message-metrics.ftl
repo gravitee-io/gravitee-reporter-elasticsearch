@@ -15,6 +15,12 @@
                 "gateway": {
                     "type": "keyword"
                 },
+                "org-id": {
+                    "type": "keyword"
+                },
+                "env-id": {
+                    "type": "keyword"
+                },
                 "@timestamp": {
                     "type": "date"
                 },
@@ -65,6 +71,12 @@
                 },
                 "gateway-latency-ms": {
                     "type": "integer"
+                },
+                "quota-count": {
+                    "type": "keyword"
+                },
+                "quota-limit": {
+                    "type": "keyword"
                 }
                 <#if extendedRequestMappingTemplate??>,<#include "/${extendedRequestMappingTemplate}"></#if>
             },

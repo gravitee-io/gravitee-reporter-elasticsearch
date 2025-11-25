@@ -14,6 +14,12 @@
             "gateway": {
                 "type": "keyword"
             },
+            "org-id": {
+                "type": "keyword"
+            },
+            "env-id": {
+                "type": "keyword"
+            },
             "@timestamp": {
                 "type": "date"
             },
@@ -215,6 +221,12 @@
                         "index": true
                     }
                 }
+            },
+            "quota-count": {
+                "type": "keyword"
+            },
+            "quota-limit": {
+                "type": "keyword"
             }
             <#if extendedRequestMappingTemplate??>,<#include "/${extendedRequestMappingTemplate}"></#if>
         },
