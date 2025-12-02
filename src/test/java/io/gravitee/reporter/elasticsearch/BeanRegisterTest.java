@@ -22,12 +22,10 @@ import io.gravitee.elasticsearch.version.Version;
 import io.gravitee.reporter.elasticsearch.config.ReporterConfiguration;
 import io.gravitee.reporter.elasticsearch.indexer.es7.ES7BulkIndexer;
 import io.gravitee.reporter.elasticsearch.indexer.es8.ES8BulkIndexer;
-import io.gravitee.reporter.elasticsearch.indexer.es9.ES9BulkIndexer;
 import io.gravitee.reporter.elasticsearch.indexer.name.PerTypeAndDateIndexNameGenerator;
 import io.gravitee.reporter.elasticsearch.indexer.name.PerTypeIndexNameGenerator;
 import io.gravitee.reporter.elasticsearch.mapping.es7.ES7IndexPreparer;
 import io.gravitee.reporter.elasticsearch.mapping.es8.ES8IndexPreparer;
-import io.gravitee.reporter.elasticsearch.mapping.es9.ES9IndexPreparer;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -106,34 +104,6 @@ class BeanRegisterTest {
 
             assertThat(applicationContext.getBean("indexer")).isInstanceOf(ES8BulkIndexer.class);
             assertThat(applicationContext.getBean("indexPreparer")).isInstanceOf(ES8IndexPreparer.class);
-            assertThat(applicationContext.getBean("indexNameGenerator")).isInstanceOf(PerTypeIndexNameGenerator.class);
-        }
-    }
-
-    @Nested
-    class ElasticSearch9 {
-
-        @Test
-        void should_instantiate_beans_for_elasticsearch_9_daily_mode() {
-            var reporterConfiguration = new ReporterConfiguration();
-            reporterConfiguration.setIndexMode("daily");
-
-            register.registerBeans(elasticsearchInfo("9.2.1"), reporterConfiguration);
-
-            assertThat(applicationContext.getBean("indexer")).isInstanceOf(ES9BulkIndexer.class);
-            assertThat(applicationContext.getBean("indexPreparer")).isInstanceOf(ES9IndexPreparer.class);
-            assertThat(applicationContext.getBean("indexNameGenerator")).isInstanceOf(PerTypeAndDateIndexNameGenerator.class);
-        }
-
-        @Test
-        void should_instantiate_beans_for_elasticsearch_9_ilm_mode() {
-            var reporterConfiguration = new ReporterConfiguration();
-            reporterConfiguration.setIndexMode("ilm");
-
-            register.registerBeans(elasticsearchInfo("9.2.1"), reporterConfiguration);
-
-            assertThat(applicationContext.getBean("indexer")).isInstanceOf(ES9BulkIndexer.class);
-            assertThat(applicationContext.getBean("indexPreparer")).isInstanceOf(ES9IndexPreparer.class);
             assertThat(applicationContext.getBean("indexNameGenerator")).isInstanceOf(PerTypeIndexNameGenerator.class);
         }
     }
