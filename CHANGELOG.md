@@ -1,3 +1,16 @@
+## [5.5.6](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/5.5.5...5.5.6) (2025-12-03)
+
+
+### Bug Fixes
+
+* **deps:** bump reporter-common ([6d85cf9](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/6d85cf9ba5bca4fe750d673b4c73691aac46d851))
+
+
+### Reverts
+
+* Revert "fix: support ES 9.x" ([b663044](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/b663044e72b78cced718bd47d5c252ef2e1673bd))
+* Revert "fix: bump reporter-common version" ([d730bdd](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/d730bdd0c3828b35a6ef2f55cd65f1312b1f3c13))
+
 ## [5.5.5](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/5.5.4...5.5.5) (2025-11-25)
 
 
