@@ -1,3 +1,11 @@
+## [6.0.9](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.0.8...6.0.9) (2026-02-24)
+
+
+### Bug Fixes
+
+* **deps:** add vertx-web-client test dependency ([8c3ae5a](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/8c3ae5a95ce65f46caeda65b66c870a49992e728))
+* **deps:** bump common elasticsearch version ([679d49f](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/679d49f3bf7cd4c884355cc55ba8a572cf507faa))
+
 ## [6.0.8](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.0.7...6.0.8) (2025-12-03)
 
 
