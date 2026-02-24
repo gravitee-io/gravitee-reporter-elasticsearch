@@ -1,3 +1,10 @@
+## [6.0.10](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.0.9...6.0.10) (2026-02-24)
+
+
+### Bug Fixes
+
+* revert common elasticsearch 6.5.1 update and safely bump to 6.2.1 ([db36c8a](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/db36c8a1d8d6f557d9cd139603597eb793dd00ab))
+
 ## [6.0.9](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.0.8...6.0.9) (2026-02-24)
 
 
