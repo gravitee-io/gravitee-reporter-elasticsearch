@@ -16,23 +16,21 @@
 package io.gravitee.reporter.elasticsearch.factory;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.gravitee.elasticsearch.client.Client;
+import io.gravitee.elasticsearch.exception.ElasticsearchException;
 import io.gravitee.elasticsearch.version.ElasticsearchInfo;
 import io.gravitee.elasticsearch.version.Version;
-import io.gravitee.reporter.common.formatter.FormatterFactoryConfiguration;
-import io.gravitee.reporter.elasticsearch.config.PipelineConfiguration;
 import io.gravitee.reporter.elasticsearch.config.ReporterConfiguration;
-import io.gravitee.reporter.elasticsearch.indexer.IndexNameGenerator;
 import io.gravitee.reporter.elasticsearch.indexer.PerTypeAndDateIndexNameGenerator;
 import io.gravitee.reporter.elasticsearch.indexer.PerTypeIndexNameGenerator;
 import io.gravitee.reporter.elasticsearch.mapping.es7.ES7IndexPreparer;
 import io.gravitee.reporter.elasticsearch.mapping.es8.ES8IndexPreparer;
 import io.reactivex.rxjava3.core.Single;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,8 +39,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 
 /**
  * @author Guillaume LAMIRAND (guillaume.lamirand at graviteesource.com)
@@ -141,6 +137,95 @@ class BeanFactoryBuilderTest {
             assertThat(beanFactory).isNotNull();
             assertThat(beanFactory.createIndexNameGenerator(reporterConfiguration)).isInstanceOf(PerTypeIndexNameGenerator.class);
             assertThat(beanFactory.createIndexPreparer(reporterConfiguration, null, null, null)).isInstanceOf(ES7IndexPreparer.class);
+        }
+    }
+
+    @Nested
+    class AuthenticationError {
+
+        @Test
+        void should_fail_immediately_on_401_unauthorized() {
+            when(client.getInfo()).thenReturn(Single.error(new ElasticsearchException("Unauthorized", 401)));
+
+            assertThatThrownBy(() -> BeanFactoryBuilder.buildFactory(client)).isInstanceOf(ElasticsearchException.class);
+
+            verify(client, times(1)).getInfo();
+        }
+
+        @Test
+        void should_fail_immediately_on_403_forbidden() {
+            when(client.getInfo()).thenReturn(Single.error(new ElasticsearchException("Forbidden", 403)));
+
+            assertThatThrownBy(() -> BeanFactoryBuilder.buildFactory(client)).isInstanceOf(ElasticsearchException.class);
+
+            verify(client, times(1)).getInfo();
+        }
+
+        @Test
+        void should_fail_immediately_on_wrapped_401() {
+            when(client.getInfo()).thenReturn(Single.error(new RuntimeException(new ElasticsearchException("Unauthorized", 401))));
+
+            assertThatThrownBy(() -> BeanFactoryBuilder.buildFactory(client)).isInstanceOf(RuntimeException.class);
+
+            verify(client, times(1)).getInfo();
+        }
+
+        @Test
+        void should_fail_immediately_on_wrapped_403() {
+            when(client.getInfo()).thenReturn(Single.error(new RuntimeException(new ElasticsearchException("Forbidden", 403))));
+
+            assertThatThrownBy(() -> BeanFactoryBuilder.buildFactory(client)).isInstanceOf(RuntimeException.class);
+
+            verify(client, times(1)).getInfo();
+        }
+
+        @Test
+        void should_detect_401_as_unauthorized() {
+            assertThat(BeanFactoryBuilder.isUnauthorized(new ElasticsearchException("error", 401))).isTrue();
+            assertThat(BeanFactoryBuilder.isUnauthorized(new ElasticsearchException("error", 403))).isFalse();
+        }
+
+        @Test
+        void should_detect_403_as_forbidden() {
+            assertThat(BeanFactoryBuilder.isForbidden(new ElasticsearchException("error", 403))).isTrue();
+            assertThat(BeanFactoryBuilder.isForbidden(new ElasticsearchException("error", 401))).isFalse();
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = { 400, 404, 500, 502, 503 })
+        void should_not_detect_other_status_codes(int statusCode) {
+            assertThat(BeanFactoryBuilder.isUnauthorized(new ElasticsearchException("error", statusCode))).isFalse();
+            assertThat(BeanFactoryBuilder.isForbidden(new ElasticsearchException("error", statusCode))).isFalse();
+        }
+
+        @Test
+        void should_not_detect_error_without_status_code() {
+            assertThat(BeanFactoryBuilder.isUnauthorized(new ElasticsearchException("Connection refused"))).isFalse();
+            assertThat(BeanFactoryBuilder.isForbidden(new ElasticsearchException("Connection refused"))).isFalse();
+        }
+
+        @Test
+        void should_not_detect_non_elasticsearch_exceptions() {
+            assertThat(BeanFactoryBuilder.isUnauthorized(new RuntimeException("error"))).isFalse();
+            assertThat(BeanFactoryBuilder.isForbidden(new RuntimeException("error"))).isFalse();
+        }
+
+        @Test
+        void should_find_elasticsearch_exception_in_cause_chain() {
+            var esException = new ElasticsearchException("error", 401);
+            var wrapped = new RuntimeException(new IllegalStateException(esException));
+            assertThat(BeanFactoryBuilder.findElasticsearchException(wrapped)).isSameAs(esException);
+        }
+
+        @Test
+        void should_return_null_when_no_elasticsearch_exception_in_chain() {
+            var wrapped = new RuntimeException(new IllegalStateException("error"));
+            assertThat(BeanFactoryBuilder.findElasticsearchException(wrapped)).isNull();
+        }
+
+        @Test
+        void should_return_null_for_null_throwable() {
+            assertThat(BeanFactoryBuilder.findElasticsearchException(null)).isNull();
         }
     }
 
