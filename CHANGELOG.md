@@ -1,3 +1,10 @@
+## [6.0.12](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.0.11...6.0.12) (2026-03-25)
+
+
+### Bug Fixes
+
+* **reporter:** fail fast on Elasticsearch authentication errors (401/403) ([01f495f](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/01f495f59e141e555059b59c5fbc9167685bc689))
+
 ## [6.0.11](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.0.10...6.0.11) (2026-03-05)
 
 
