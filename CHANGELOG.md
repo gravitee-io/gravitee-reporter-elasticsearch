@@ -1,3 +1,10 @@
+## [7.4.5](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/7.4.4...7.4.5) (2026-03-25)
+
+
+### Bug Fixes
+
+* **reporter:** fail fast on Elasticsearch authentication errors (401/403) ([3fc7c72](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/3fc7c7243007dc086772b5550ff30588c9071cf2))
+
 ## [7.4.4](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/7.4.3...7.4.4) (2026-03-05)
 
 
