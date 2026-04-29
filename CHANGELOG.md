@@ -1,3 +1,10 @@
+## [6.0.13](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.0.12...6.0.13) (2026-04-29)
+
+
+### Bug Fixes
+
+* bump reporter-common to 1.6.10 to fix msgpack security vulnerability (APIM-12726) ([4a7e5f3](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/4a7e5f318acf4a0f0a48579f68e27e9b2eadf0a6))
+
 ## [6.0.12](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.0.11...6.0.12) (2026-03-25)
 
 
