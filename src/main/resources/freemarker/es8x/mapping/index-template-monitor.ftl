@@ -4,7 +4,7 @@
     "template": {
         "settings": {
             <#if indexLifecyclePolicyMonitor?has_content>"${indexLifecyclePolicyPropertyName?json_string}": "${indexLifecyclePolicyMonitor?json_string}",</#if>
-            <#if indexLifecyclePolicyMonitor?has_content>"${indexLifecycleRolloverAliasPropertyName?json_string}": "${indexName}",</#if>
+            <#if indexLifecyclePolicyMonitor?has_content>"${indexLifecycleRolloverAliasPropertyName?json_string}": "${indexName?json_string}",</#if>
             "index.number_of_shards":${numberOfShards},
             "index.number_of_replicas":${numberOfReplicas},
             "index.refresh_interval": "${refreshInterval}"
