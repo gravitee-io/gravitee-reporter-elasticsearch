@@ -87,6 +87,14 @@ class IndexTemplateTest {
     }
 
     @Test
+    void should_render_no_lifecycle_block_when_the_policy_is_configured_empty() {
+        var configuration = configurationWithPolicies();
+        configuration.setIndexLifecyclePolicyLog("");
+
+        assertThat(render("es8x", "log", configuration)).doesNotContain("index.lifecycle.name");
+    }
+
+    @Test
     void should_escape_property_names_and_policies_so_a_malformed_one_cannot_break_the_json_body() {
         var configuration = configurationWithPolicies();
         configuration.setIndexLifecyclePolicyPropertyName("bad\"name");

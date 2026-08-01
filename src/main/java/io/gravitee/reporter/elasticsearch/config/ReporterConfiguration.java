@@ -207,13 +207,13 @@ public class ReporterConfiguration {
      * Policy name Property name
      */
     @Value("${reporters.elasticsearch.lifecycle.policy_property_name:" + DEFAULT_INDEX_LIFECYCLE_POLICY_PROPERTY_NAME + "}")
-    private String indexLifecyclePolicyPropertyName = DEFAULT_INDEX_LIFECYCLE_POLICY_PROPERTY_NAME;
+    private String indexLifecyclePolicyPropertyName;
 
     /**
      * Rollover name Property name
      */
     @Value("${reporters.elasticsearch.lifecycle.rollover_alias_property_name:" + DEFAULT_INDEX_LIFECYCLE_ROLLOVER_ALIAS_PROPERTY_NAME + "}")
-    private String indexLifecycleRolloverAliasPropertyName = DEFAULT_INDEX_LIFECYCLE_ROLLOVER_ALIAS_PROPERTY_NAME;
+    private String indexLifecycleRolloverAliasPropertyName;
 
     /**
      * Extended settings template
