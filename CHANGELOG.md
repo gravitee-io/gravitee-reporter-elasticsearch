@@ -1,3 +1,11 @@
+## [6.3.8](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.3.7...6.3.8) (2026-09-25)
+
+
+### Bug Fixes
+
+* **reporter:** honour lifecycle property name in event-metrics templates ([1a3cb32](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/1a3cb32e8820ba1788ac9426f5051875b65298b0))
+* **reporter:** respect lifecycle property-name overrides in ES templates ([4abb989](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/4abb989d6f33a6c4e28508e018ef0eaccb16cfb5))
+
 ## [6.3.7](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/6.3.6...6.3.7) (2026-04-29)
 
 
