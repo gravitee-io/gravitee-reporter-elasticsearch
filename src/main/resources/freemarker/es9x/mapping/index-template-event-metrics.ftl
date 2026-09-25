@@ -1,11 +1,12 @@
 <#ftl output_format="JSON">
+<#assign eventMetricsPolicy = indexLifecyclePolicyEventMetrics!"event-metrics-ilm-policy">
 {
     "index_patterns": ["${indexName}*"],
     "data_stream": {},
     "template": {
         "settings": {
-            "index.mode": "time_series",
-            "index.lifecycle.name": "event-metrics-ilm-policy"
+            "index.mode": "time_series"<#if eventMetricsPolicy?has_content>,
+            "${indexLifecyclePolicyPropertyName?json_string}": "${eventMetricsPolicy?json_string}"</#if>
         },
         "mappings": {
             "properties": {
