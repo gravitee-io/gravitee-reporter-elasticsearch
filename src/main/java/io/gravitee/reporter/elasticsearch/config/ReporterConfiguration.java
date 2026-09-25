@@ -204,6 +204,13 @@ public class ReporterConfiguration {
     private String indexLifecyclePolicyLog;
 
     /**
+     * Index indexLifecyclePolicy Policy: event metrics. Unset keeps the built-in policy name of the Elasticsearch
+     * templates; empty renders no lifecycle setting.
+     */
+    @Value("${reporters.elasticsearch.lifecycle.policies.event_metrics:#{null}}")
+    private String indexLifecyclePolicyEventMetrics;
+
+    /**
      * Policy name Property name
      */
     @Value("${reporters.elasticsearch.lifecycle.policy_property_name:" + DEFAULT_INDEX_LIFECYCLE_POLICY_PROPERTY_NAME + "}")
@@ -430,6 +437,14 @@ public class ReporterConfiguration {
 
     public void setIndexLifecyclePolicyLog(String indexLifecyclePolicyLog) {
         this.indexLifecyclePolicyLog = indexLifecyclePolicyLog;
+    }
+
+    public String getIndexLifecyclePolicyEventMetrics() {
+        return indexLifecyclePolicyEventMetrics;
+    }
+
+    public void setIndexLifecyclePolicyEventMetrics(String indexLifecyclePolicyEventMetrics) {
+        this.indexLifecyclePolicyEventMetrics = indexLifecyclePolicyEventMetrics;
     }
 
     public String getIndexLifecyclePolicyPropertyName() {
