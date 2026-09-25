@@ -3,7 +3,7 @@
     "index_patterns": ["${indexName}*"],
     "template": {
         "settings": {
-            <#if indexLifecyclePolicyHealth?has_content>"index.plugins.index_state_management.policy_id": "${indexLifecyclePolicyHealth}",</#if>
+            <#if indexLifecyclePolicyHealth?has_content>"index.plugins.index_state_management.policy_id": "${indexLifecyclePolicyHealth?json_string}",</#if>
             <#if indexLifecyclePolicyHealth?has_content>"index.plugins.index_state_management.rollover_alias": "${indexName}",</#if>
             "index.number_of_shards":${numberOfShards},
             "index.number_of_replicas":${numberOfReplicas},

@@ -17,6 +17,7 @@ package io.gravitee.reporter.elasticsearch.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.gravitee.common.templating.FreeMarkerComponent;
 import io.gravitee.elasticsearch.utils.Type;
 import io.gravitee.reporter.elasticsearch.config.PipelineConfiguration;
@@ -24,6 +25,7 @@ import io.gravitee.reporter.elasticsearch.config.ReporterConfiguration;
 import io.gravitee.reporter.elasticsearch.mapping.es7.ES7IndexPreparer;
 import io.gravitee.reporter.elasticsearch.mapping.es8.ES8IndexPreparer;
 import io.gravitee.reporter.elasticsearch.mapping.es9.ES9IndexPreparer;
+import io.gravitee.reporter.elasticsearch.mapping.opensearch.OpenSearchIndexPreparer;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -109,6 +111,35 @@ class IndexTemplateTest {
             .contains("\"bad\\\"policy\"");
     }
 
+    static Stream<Type> lifecycle_types() {
+        return Stream.of(
+            Type.REQUEST,
+            Type.HEALTH_CHECK,
+            Type.LOG,
+            Type.MONITOR,
+            Type.V4_LOG,
+            Type.V4_METRICS,
+            Type.V4_MESSAGE_LOG,
+            Type.V4_MESSAGE_METRICS
+        );
+    }
+
+    @ParameterizedTest(name = "opensearch {0} template escapes the policy id")
+    @MethodSource("lifecycle_types")
+    void should_escape_policy_in_opensearch_template_so_the_body_stays_valid_json(Type type) throws Exception {
+        var configuration = configurationWithPolicies();
+        configuration.setIndexLifecyclePolicyHealth("bad\"policy");
+        configuration.setIndexLifecyclePolicyMonitor("bad\"policy");
+        configuration.setIndexLifecyclePolicyRequest("bad\"policy");
+        configuration.setIndexLifecyclePolicyLog("bad\"policy");
+
+        var settings = new ObjectMapper()
+            .readTree(preparerFor("opensearch", configuration).generateIndexTemplate(type))
+            .at("/template/settings");
+
+        assertThat(settings.get("index.plugins.index_state_management.policy_id").asText()).isEqualTo("bad\"policy");
+    }
+
     private static ReporterConfiguration configurationWithPolicies() {
         var configuration = new ReporterConfiguration();
         // @Value defaults only apply under Spring and these fields have no initialisers, so a
@@ -136,6 +167,7 @@ class IndexTemplateTest {
             case "es7x" -> new ES7IndexPreparer(configuration, pipelineConfiguration, freeMarkerComponent, null);
             case "es8x" -> new ES8IndexPreparer(configuration, pipelineConfiguration, freeMarkerComponent, null);
             case "es9x" -> new ES9IndexPreparer(configuration, pipelineConfiguration, freeMarkerComponent, null);
+            case "opensearch" -> new OpenSearchIndexPreparer(configuration, pipelineConfiguration, freeMarkerComponent, null);
             default -> throw new IllegalArgumentException("Unknown es dir: " + esDir);
         };
     }
