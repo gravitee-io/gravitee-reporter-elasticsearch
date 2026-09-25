@@ -1,3 +1,11 @@
+## [7.4.7](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/7.4.6...7.4.7) (2026-09-25)
+
+
+### Bug Fixes
+
+* **reporter:** escape the lifecycle policy in OpenSearch index templates ([155ec86](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/155ec863d174b2966862e2562bca3735371fb146))
+* **reporter:** respect lifecycle property-name overrides in ES templates ([f24ca1c](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/f24ca1c1d48f50f60874bc72bc86556c89b3856f))
+
 ## [7.4.6](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/7.4.5...7.4.6) (2026-04-29)
 
 
