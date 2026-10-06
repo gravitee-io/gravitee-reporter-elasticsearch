@@ -1,3 +1,10 @@
+## [7.4.8](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/7.4.7...7.4.8) (2026-10-06)
+
+
+### Bug Fixes
+
+* mcp version metrics are mapped as dates in elasticsearch ([7ccf916](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/commit/7ccf91691c5892cd8638790de5b9b9dc65c94f52))
+
 ## [7.4.7](https://github.com/gravitee-io/gravitee-reporter-elasticsearch/compare/7.4.6...7.4.7) (2026-09-25)
 
 
